@@ -4,12 +4,113 @@
   <meta http-equiv="content-type" content="text/html;charset=utf-8" />
   <title>Sailcalc</title>
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/ui-darkness/jquery-ui.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
-  <script>
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>-->
+  <script src="jquery.min.js"></script>
+  <script src="jquery-ui.min.js"></script>
+  <script type="text/javascript">
    $(function() {
     $( "#maintabs" ).tabs();
    });
+
+   jQuery.ajaxSetup({ "async": false });
+   boatData = new Array();
+   $.getJSON('boatdata.json', function(data) {
+     $.each(data, function(key, val) {
+       boatData[key] = val;
+     });
+   });
+
+function updateBoatInfo(boatIndex, id_prefix)
+{
+ boatName = boatData[boatIndex].boatName;
+ LOA = boatData[boatIndex].LOA;
+ LWL = boatData[boatIndex].LWL;
+ beam = boatData[boatIndex].beam;
+ displacement = boatData[boatIndex].displacement;
+ sailArea = boatData[boatIndex].sailArea;
+
+ document.getElementById(id_prefix + 'Name').innerHTML = boatName;
+ document.getElementById(id_prefix + 'LOA').innerHTML = LOA;
+ document.getElementById(id_prefix + 'LWL').innerHTML = LWL;
+ document.getElementById(id_prefix + 'Beam').innerHTML = beam;
+ document.getElementById(id_prefix + 'Displacement').innerHTML = displacement;
+ document.getElementById(id_prefix + 'SailArea').innerHTML = sailArea;
+
+ document.getElementById(id_prefix + 'dispToLWL').innerHTML = calculateDisplacementToLWL(displacement, LWL).toFixed(2);
+ document.getElementById(id_prefix + 'HullSpeed').innerHTML = calculateHullSpeed(LWL).toFixed(2);
+ document.getElementById(id_prefix + 'SailAreaToDisp').innerHTML = calculateSailAreaToDisplacement(sailArea, displacement).toFixed(2);
+ document.getElementById(id_prefix + 'LWLToBeam').innerHTML = calculateLWLToBeam(LWL, beam).toFixed(2);
+ document.getElementById(id_prefix + 'MotionComfort').innerHTML = calculateMotionComfort(displacement, LWL, LOA, beam).toFixed(2);
+ document.getElementById(id_prefix + 'CapsizeRatio').innerHTML = calculateCapsizeRatio(beam, displacement).toFixed(2);
+ document.getElementById(id_prefix + 'SailingCategory').innerHTML = getCategory(sailArea, displacement, LWL);
+ document.getElementById(id_prefix + 'PoundsPerInch').innerHTML = calculatePoundsPerInch(LWL, beam).toFixed(2);
+}
+
+function calculateHullSpeed(LWL)
+{
+ return(Math.sqrt(LWL)*1.34);
+}
+
+function calculateDisplacementToLWL(displacement, LWL)
+{
+ return(displacement/2240.)/Math.pow((LWL*.01),3);
+}
+
+function calculateSailAreaToDisplacement(sailArea, displacement)
+{
+ return(sailArea/Math.pow((displacement/64.),(2./3.)));
+}
+
+function calculateLWLToBeam(LWL, beam)
+{
+ return(LWL/beam);
+}
+
+function calculateMotionComfort(displacement, LWL, LOA, beam)
+{
+ return(displacement/((0.7 * LWL + 0.3 * LOA) * 0.65 * Math.pow(beam, (4.0/3.0))));
+}
+
+function calculateCapsizeRatio(beam, displacement)
+{
+ return(beam / Math.pow((displacement / 64.0), (1.0 / 3.0)));
+}
+
+function calculatePoundsPerInch(LWL, beam)
+{
+ return(3.57311 * LWL * beam);
+}
+
+function getCategory(sailArea, displacement, LWL)
+{
+ sailAreaToDisplacement = calculateSailAreaToDisplacement(sailArea, displacement);
+ displacementToLWL = calculateDisplacementToLWL(displacement, LWL);
+
+ if(sailAreaToDisplacement < 18.) 
+ {
+  if(displacementToLWL < 235.) 
+  {
+   return("cruiser/racer");
+  }
+  else 
+  {
+   return("cruiser");
+  }
+ }
+ else 
+ {
+  if(displacementToLWL < 235.) 
+  {
+   return("racer");
+  }
+  else 
+  {
+   return("racer/cruiser");
+  }
+ }
+}
+
   </script>
  </head>
  <body>
@@ -21,8 +122,41 @@
     <li><a href="#tab-4">Prop Size</a></li>
    </ul>
    <div id="tab-1">
-    Select a boat and see its details
-   </div>
+    <div id="boatFormDiv">
+     Select a boat and see its details
+     <form name="selectBoatForm"> 
+     <!--<select id="selectBoat1" onchange="updateBoatInfo($('select.selectBoat1').val());">-->
+     <select id="selectBoat1" onchange="updateBoatInfo(document.getElementById('selectBoat1').selectedIndex, 'boat1');">
+     </select>
+     <script type="text/javascript">
+     var boatIndex;
+     var data;
+     for (boatIndex in boatData)
+     {
+      var select = document.getElementById("selectBoat1");
+      select.options[select.options.length] = new Option(boatData[boatIndex].boatName, boatIndex);
+     }
+    </script>
+    </form>
+    </div>
+<div id="boatInfoDiv">
+Name: <span id="boat1Name"></span><br />
+LOA: <span id="boat1LOA"></span><br />
+LWL: <span id="boat1LWL"></span><br />
+Beam: <span id="boat1Beam"></span><br />
+Displacement: <span id="boat1Displacement"></span><br />
+SailArea: <span id="boat1SailArea"></span><br />
+<p>
+Displacement to LWL: <span id="boat1dispToLWL"></span><br />
+Hull Speed: <span id="boat1HullSpeed"></span><br />
+Sail area to displacement: <span id="boat1SailAreaToDisp"></span><br />
+LWL to beam: <span id="boat1LWLToBeam"></span><br />
+Motion comfort: <span id="boat1MotionComfort"></span><br />
+Capsize ratio: <span id="boat1CapsizeRatio"></span><br />
+Sailing category: <span id="boat1SailingCategory"></span><br />
+Pounds/Inch: <span id="boat1PoundsPerInch"></span><br />
+</div>
+</div>
    <div id="tab-2">
     Select more than one boat and see them compared
    </div>
