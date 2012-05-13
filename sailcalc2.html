@@ -112,6 +112,40 @@ function getCategory(sailArea, displacement, LWL)
 }
 
   </script>
+<style type="text/css">
+		.tooltip {
+			border-bottom: 1px dotted #000000; color: #000000; outline: none;
+			cursor: help; text-decoration: none;
+			position: relative;
+		}
+		.tooltip span {
+			margin-left: -999em;
+			position: absolute;
+		}
+		.tooltip:hover span {
+			border-radius: 5px 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; 
+			box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1); -webkit-box-shadow: 5px 5px rgba(0, 0, 0, 0.1); -moz-box-shadow: 5px 5px rgba(0, 0, 0, 0.1);
+			font-family: Calibri, Tahoma, Geneva, sans-serif;
+			position: absolute; left: 1em; top: 2em; z-index: 99;
+			margin-left: 0; width: 450px;
+		}
+		.tooltip:hover img {
+			border: 0; margin: -10px 0 0 -55px;
+			float: left; position: absolute;
+		}
+		.tooltip:hover em {
+			font-family: Candara, Tahoma, Geneva, sans-serif; font-size: 1.2em; font-weight: bold;
+			display: block; padding: 0.2em 0 0.6em 0;
+		}
+		.classic { padding: 0.8em 1em; }
+		.custom { padding: 0.5em 0.8em 0.8em 2em; }
+		* html a:hover { background: transparent; }
+		.classic {background: #FFFFAA; border: 1px solid #FF3334; color: #000000; }
+		.critical { background: #FFCCAA; border: 1px solid #FF3334;	}
+		.help { background: #9FDAEE; border: 1px solid #2BB0D7;	}
+		.info { background: #9FDAEE; border: 1px solid #2BB0D7;	}
+		.warning { background: #FFFFAA; border: 1px solid #FFAD33; }
+		</style>
  </head>
  <body>
   <div id="maintabs">
@@ -126,7 +160,7 @@ function getCategory(sailArea, displacement, LWL)
      Select a boat and see its details
      <form name="selectBoatForm"> 
      <!--<select id="selectBoat1" onchange="updateBoatInfo($('select.selectBoat1').val());">-->
-     <select id="selectBoat1" onchange="updateBoatInfo(document.getElementById('selectBoat1').selectedIndex, 'boat1');">
+     <select size=10 id="selectBoat1" onchange="updateBoatInfo(document.getElementById('selectBoat1').selectedIndex, 'boat1');">
      </select>
      <script type="text/javascript">
      var boatIndex;
@@ -147,18 +181,43 @@ Beam: <span id="boat1Beam"></span><br />
 Displacement: <span id="boat1Displacement"></span><br />
 SailArea: <span id="boat1SailArea"></span><br />
 <p>
-Displacement to LWL: <span id="boat1dispToLWL"></span><br />
-Hull Speed: <span id="boat1HullSpeed"></span><br />
-Sail area to displacement: <span id="boat1SailAreaToDisp"></span><br />
-LWL to beam: <span id="boat1LWLToBeam"></span><br />
-Motion comfort: <span id="boat1MotionComfort"></span><br />
-Capsize ratio: <span id="boat1CapsizeRatio"></span><br />
-Sailing category: <span id="boat1SailingCategory"></span><br />
-Pounds/Inch: <span id="boat1PoundsPerInch"></span><br />
+<a class="tooltip" href="#">Displacement to LWL:<span class="classic">Displacement to LWL: A medium value would be 200. 300 would be high (Heavy Cruising Boat) and 100 would be low (Ultra Light Displacement-ULDB). Boats with low numbers are probably uncomfortable and difficult to sail.</span></a><span id="boat1dispToLWL"></span><br />
+<a class="tooltip" href="#">Hull Speed: <span class="classic">Hull Speed: This is the maximum speed of a displacement hull. Some racers and lighter boats are able to achieve greater speed by lifting over the bow wave and riding on top of the water,that is, planing. </span></a><span id="boat1HullSpeed"></span><br />
+<a class="tooltip" href="#">Sail area to displacement: <span class="classic">Sail Area to Displacement: The sail area is the total of the main sail and the area of the front triangle. I cannot be sure that this datum was entered correctly for each listed boat. A racing boat typically  has large sail area and low displacement. A number less than 13 probably indicates that the boat is a motorsailer. High performance boats would be around 18 or higher.</span></a><span id="boat1SailAreaToDisp"></span><br />
+<a class="tooltip" href="#">LWL to beam: <span class="classic">LWL to Beam: A medium value would be 2.7. 3.0 would be high and 2.3 would be low</span></a><span id="boat1LWLToBeam"></span><br />
+<a class="tooltip" href="#">Motion comfort: <span class="classic">Motion Comfort: Range will be from 5 to 60+ with a Whitby 42 at the mid 30's. The higher the number the more comfort in a sea. This figure of merit was developed by the Yacht designer Ted Brewer and is meant to compare the motion comfort of boats of similar size and types.</span></a><span id="boat1MotionComfort"></span><br />
+<a class="tooltip" href="#">Capsize ratio: <span class="classic">Capsize Ratio: A value less than 2 is considered to be relatively good; the boat should be relatively safe in bad conditions. The higher the number above 2 the more vulnerable the boat. This is just a rough figure of merit and controversial as to its use.</span></a><span id="boat1CapsizeRatio"></span><br />
+<a class="tooltip" href="#">Sailing category: <span class="classic">Sailing Category: The four categories are racer, racer/cruiser, cruiser/racer, and cruiser in order of descending performance</span></a><span id="boat1SailingCategory"></span><br />
+<a class="tooltip" href="#">Pounds/Inch: <span class="classic">Pounds per Inch Immersion: The weight required to sink the yacht one inch. If the boat is in fresh water multiply the result by 0.975. If you know the beam at the waterline (BWL) multipy the result by BWL/Beam.</span></a><span id="boat1PoundsPerInch"></span><br />
 </div>
 </div>
    <div id="tab-2">
     Select more than one boat and see them compared
+     <form name="selectBoatForm"> 
+<table>
+<tr>
+<td>
+     <select size=10 id="compareBoat1" onchange="updateBoatInfo(document.getElementById('compareBoat1').selectedIndex, 'boat1');">
+     </select>
+</td>
+<td>
+     <select size=10 id="compareBoat2" onchange="updateBoatInfo(document.getElementById('compareBoat1').selectedIndex, 'boat1');">
+     </select>
+</td>
+</tr>
+</table>
+     <script type="text/javascript">
+     var boatIndex;
+     var data;
+     for (boatIndex in boatData)
+     {
+      var select1 = document.getElementById("compareBoat1");
+      var select2 = document.getElementById("compareBoat2");
+      select1.options[select1.options.length] = new Option(boatData[boatIndex].boatName, boatIndex);
+      select2.options[select2.options.length] = new Option(boatData[boatIndex].boatName, boatIndex);
+     }
+    </script>
+    </form>
    </div>
    <div id="tab-3">
     Search for suitable boats
